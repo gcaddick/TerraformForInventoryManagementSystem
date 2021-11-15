@@ -249,10 +249,13 @@ def IsProdNew(prod_id):
 
 
 def upload(prod_id, img):  # Uses the prod_id to name the picture uploaded to source bucket
+    print("Inside upload function")    
     if img:
+        print("Img is true")   
         filename = secure_filename(img.filename)  # Gets the file name for the picture
         fileNameSplit = filename.split(".")  # Splits the filename to get the extension
         fileExtention = fileNameSplit[1]
+        print(filename)
         if fileExtention in ALLOWED_EXTENSIONS:  # Checks if the extensions are in the allowed extensions
             filename = prod_id + "." + fileExtention
             img.save(filename)
@@ -287,8 +290,11 @@ def add_product():
 
             checkIfProdIsNew = IsProdNew(prod_id)  # Checks if the product is new or exisiting
 
-            if checkIfProdIsNew:
+            print("-------------> ") #Debug
+            print(checkIfProdIsNew)
 
+            if checkIfProdIsNew:
+                print("In first If ")
                 msgFromS3Upload, filename = upload(prod_id, img)
                 print("-----yoyoyooy------")
                 print(filename)
