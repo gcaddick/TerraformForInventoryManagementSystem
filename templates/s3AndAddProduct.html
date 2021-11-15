@@ -1,0 +1,42 @@
+<html>
+   <body>
+      
+      <form action = "{{ url_for('add_product') }}" method = "POST">
+         <h3>User Information</h3>
+
+         Product ID<br>
+         <input type = "text" name = "prod_ID" /></br>
+
+         Product Name<br>
+         <input type = "text" name = "prod_name" /></br>
+
+         Price of Product<br>
+         <input type = "text" name = "price" /></br>
+
+         Description<br>
+         <textarea name = "desc" ></textarea><br>
+
+         Quantity<br>
+         <input type = "text" name = quantity /></br>
+
+         Authenticated<br>
+         <select name= auth method="GET" action="/">
+            {% for auth in authenticated %}
+            <option value= "{{auth}}" SELECTED>{{auth}}</option>"
+            {% endfor %}
+        </select><br>
+         
+         <br>
+         <p class="card-text">Choose a file to upload it to AWS S3</p>
+         <input type="file" name="file" value="file">
+         <hr>
+         <br>
+         <input type = "submit" value = "submit" /><br>
+      </form>
+
+
+      
+      <a href = "/">Go back to home page</a>
+      
+   </body>
+</html>

@@ -1,0 +1,40 @@
+<html>
+   <body>
+      
+      <form action = "{{ url_for('add_user') }}" name="user_login_data" method = "POST">
+         <h3>User Information</h3>
+
+         Email<br>
+         <input type = "text" name = "email" /></br>
+
+         First Name<br>
+         <input type = "text" name = "fn" /></br>
+
+         Last Name<br>
+         <input type = "text" name = "ln" /></br>
+
+         Password<br>
+         <input type = password name = "pword" /></br>
+
+         Address<br>
+         <textarea name = "addr" ></textarea><br>
+         
+         City<br>
+         <input type = "text" name = "city" /><br>
+         
+         Role<br>
+         <select name= role method="GET" action="/">
+            {% for role in roles %}
+            <option value= "{{role}}" SELECTED>{{role}}</option>"
+            {% endfor %}
+        </select><br>
+         <br>
+         <input type = "submit" value = "submit" /><br>
+      </form>
+
+
+      
+      <a href = "/oldhome">Go back to home page</a>
+      
+   </body>
+</html>

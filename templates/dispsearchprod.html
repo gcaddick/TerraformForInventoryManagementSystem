@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+   <body>
+   
+      <table border = 1>
+         <thead>
+            <td>Product Id</td>
+            <td>Product Name</td>
+            <td>Product Price</td>
+            <td>Description</td>
+            <td>Quantity</td>
+            <td>Authenticated</td>
+            <td>Picture</td>
+
+         </thead>
+         
+         {% for row in user_search %}
+            <tr>
+               <td>{{row["prod_id"]}}</td>
+               <td>{{row["prod_name"]}}</td>
+               <td>{{row["price"]}}</td>
+               <td>{{row["desc"]}}</td>
+               <td>{{row['quantity']}}</td>
+               <td>{{row['auth']}}</td>
+               <td>{{row['prod_url']}}</td>
+            </tr>
+         {% endfor %}
+      </table>
+      <br>
+      <br>
+      <a href = "/editprod">Edit Product</a>
+      <br>
+      <a href = "/deleteprod">Delete Product</a>
+      <br>
+      <a href = "/">Return Home</a>
+      
+      
+   </body>
+</html>

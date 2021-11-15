@@ -1,0 +1,45 @@
+<html>
+   <body>
+      
+      <form action = "{{ url_for('add_product') }}" method = "POST" enctype="multipart/form-data">
+         <h3>User Information</h3>
+
+         Product ID<br>
+         <input type = "text" name = "prod_ID" /></br>
+
+         Product Name<br>
+         <input type = "text" name = "prod_name" /></br>
+
+         Product Price<br>
+         <input type = "text" name = "price" /></br>
+
+         Description<br>
+         <textarea name = "desc" ></textarea><br>
+
+         Quantity<br>
+         <input type = "text" name = quantity /></br>
+
+         Authenticated<br>
+         <select name= auth method="GET" action="/">
+            {% for auth in authenticated %}
+            <option value= "{{auth}}" SELECTED>{{auth}}</option>"
+            {% endfor %}<br>
+         Picture<br>
+        </select><br>
+           <input type="file" name="file" value="file">
+           <hr>
+           <input type = "submit" value = "submit" /><br>
+         </form>
+         <br>
+         
+
+
+
+
+      
+         <a href = "/oldhome">Go back to home page</a>
+      
+   </body>
+</html>
+
+
