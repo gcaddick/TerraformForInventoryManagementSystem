@@ -179,6 +179,12 @@ def list_users():
 # USer login page, calls the check_user_login function
 @app.route('/UserLogin')
 def user_login():
+    IsLoggedIn = user.GetLogin()
+
+    if IsLoggedIn:
+        msg = "You're already logged in."
+        return render_template("new_result.html", msg=msg)
+
     return render_template('UserLogin.html')
 
 
@@ -231,10 +237,27 @@ def check_user_login():
 # For adding new products to inventory
 @app.route('/newproduct')
 def new_product():
-    # For the drop down menu if the item is authenticated or not
-    authenticated = ['Yes', 'No']
-    return render_template("newproduct.html", authenticated=authenticated)
+    IsLoggedIn = user.GetLogin()
+    usersRole = user.GetRole()
+    
+    if IsLoggedIn:
+        if usersRole == 'Warehouse' or usersRole == 'Authenticator':
 
+            # For the drop down menu if the item is authenticated or not
+            authenticated = ['Yes', 'No']
+            return render_template("newproduct.html", authenticated=authenticated)
+        elif usersRole == 'Customer':
+
+            msg = "You do not have permissions to access this page."
+        
+        else:
+            msg = "This message should not be displayed. Something went wrong somewhere. This message is printed from WebAppForUsers.py in the function new_product()"
+        
+    else:
+
+        msg = "You're not logged in, please log in first."
+        
+    return render_template("new_result.html", msg=msg)
 
 # Using the product id, the product is checked to see if it already exists
 def IsProdNew(prod_id):
@@ -370,6 +393,12 @@ def disp_image():
 
 @app.route('/enternewuser')
 def newRegistrationPage():
+    IsLoggedIn = user.GetLogin()
+
+    if IsLoggedIn:
+         msg = "You are already logged in."
+         return render_template("new_result.html", msg=msg)
+
     roles = ['Warehouse', 'Authenticator', 'Customer']
     return render_template('NewRegistrationPage.html', roles=roles)
 
@@ -466,7 +495,26 @@ def clearUserLogin():
 
 @app.route('/searchproducts')
 def search_product():
-    return render_template("searchproducts.html")
+    IsLoggedIn = user.GetLogin()
+    usersRole = user.GetRole()
+    
+    if IsLoggedIn:
+        if usersRole == 'Warehouse' or usersRole == 'Authenticator':
+            return render_template("searchproducts.html")
+        
+        elif usersRole == 'Customer':
+
+            msg = "You do not have permissions to access this page."
+        
+        else:
+            msg = "This message should not be displayed. Something went wrong somewhere. This message is printed from WebAppForUsers.py in the function new_product()"
+        
+    else:
+
+        msg = "You're not logged in, please log in first."
+        
+    return render_template("new_result.html", msg=msg)
+        
 
 @app.route('/usersearch', methods=['POST', 'GET'])
 def user_search():
