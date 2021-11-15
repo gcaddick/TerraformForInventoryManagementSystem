@@ -416,7 +416,12 @@ def edit_user():
 
 @app.route('/edituser')
 def dispEditInfo():
-    return render_template('EditProfilePage.html')
+    LOGIN = user.GetLogin()
+    if LOGIN:
+        return render_template('EditProfilePage.html')
+    else:
+        msg = "Please login first"
+        return render_template("new_result.html", msg=msg)
 
 @app.route('/deleteuser')
 def delete_user():
