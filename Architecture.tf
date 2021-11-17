@@ -23,6 +23,8 @@ provider "aws" {
 --------------------------------------------------------------------------*/
 resource "aws_vpc" "ApplicationVPC" {
   cidr_block = "10.0.0.0/16"
+  enable_dns_hostnames = true
+  enable_dns_support = true
 }
 
 resource "aws_subnet" "PublicSubnet" {
@@ -138,6 +140,23 @@ resource "aws_internet_gateway" "gw" {
   }
 }
 
+/*--------------------------------------------------------------------------
+            Defines route table for subnet and IG
+--------------------------------------------------------------------------*/
+resource "aws_route_table" "route-table-env" {
+  vpc_id = aws_vpc.ApplicationVPC.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.gw.id
+  }
+}
+
+resource "aws_route_table_association" "subnet-association" {
+  subnet_id      = aws_subnet.PrivateSubnet.id
+  route_table_id = aws_route_table.route-table-env.id
+}
+
 
 /*--------------------------------------------------------------------------
                          Defines ALB 
@@ -156,7 +175,6 @@ resource "aws_lb" "AppALBtoEC2" {
               Creates the bucket for Wesite code and templates 
 --------------------------------------------------------------------------*/
 /*
-
 resource "aws_s3_bucket" "template-bucket" {
     bucket = "template-bucket-5623"
     acl = "private"
@@ -253,7 +271,13 @@ resource "aws_iam_role_policy" "web_iam_role_policy" {
 EOF
 }
 
-
+/*--------------------------------------------------------------------------
+          Creates elastic IP for EC2
+--------------------------------------------------------------------------*/
+resource "aws_eip" "ip-test-env" {
+  instance = "${aws_instance.WebsiteEC2.id}"
+  vpc      = true
+}
 
 /*--------------------------------------------------------------------------
           Defines ec2 instance for program to run
