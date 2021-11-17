@@ -8,7 +8,7 @@ def singleQuery_returnAllDataForASingleQuery(queryParam, whichTable):
     response = response['Item']
     return response
 
-    
+
 def returnCorrectTable(whichTable):
     if whichTable == 'Inventory':
         dynamodbUSERS = boto3.resource('dynamodb', 'eu-west-2')
@@ -24,7 +24,7 @@ def returnCorrectTable(whichTable):
 
 def inventory_returnAllRecordData():
 
-    dynamodbInventory = boto3.resource('dynamodb')
+    dynamodbInventory = boto3.resource('dynamodb', 'eu-west-2')
     table = dynamodbInventory.Table('Inventory')
     allDataFromDynamoDBtable = table.scan(Select='ALL_ATTRIBUTES')
     recordsWithinAllDataFromDynamoDBtable = allDataFromDynamoDBtable['Items']
@@ -33,7 +33,7 @@ def inventory_returnAllRecordData():
 
 def users_returnAllRecordData():
 
-    dynamodbUSERS = boto3.resource('dynamodb')
+    dynamodbUSERS = boto3.resource('dynamodb', 'eu-west-2')
     table = dynamodbUSERS.Table('Users')
     allDataFromDynamoDBtable = table.scan(Select='ALL_ATTRIBUTES')
     recordsWithinAllDataFromDynamoDBtable = allDataFromDynamoDBtable['Items']
@@ -41,7 +41,7 @@ def users_returnAllRecordData():
     return recordsWithinAllDataFromDynamoDBtable
 
 def testForUsersDynamoDB():
-    dynamodbUSERS = boto3.resource('dynamodb')#, endpoint_url="https://dynamodb.eu-west-2.amazonaws.com")
+    dynamodbUSERS = boto3.resource('dynamodb', 'eu-west-2')#, endpoint_url="https://dynamodb.eu-west-2.amazonaws.com")
 
     table = dynamodbUSERS.Table('Users')
 
