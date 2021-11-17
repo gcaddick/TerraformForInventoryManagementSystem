@@ -103,3 +103,18 @@ def InsertNewUsers(user_id, email, fn, ln, pword, date_joined, addr, city, role)
         msg = "Error Adding User"
     return msg
 
+
+def delete_products_db(whichTable, prod_id):
+    table = returnCorrectTable(whichTable)
+    response = table.delete_item(
+        Key={
+            'prod_ID' : prod_id
+        }
+    )
+    if response['ResponseMetadata']['HTTPStatusCode'] == 200:
+        msg = "Product Successfully Deleted"
+    else:
+        msg = "Error Deleting Product"
+    return msg
+
+
