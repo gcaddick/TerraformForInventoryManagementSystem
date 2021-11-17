@@ -546,8 +546,8 @@ def user_search():
 
     inventoryTable = dynamoDB.inventory_returnAllRecordData()
     print(prod_name)
-    result = dynamoDB.singleQuery_returnAllDataForASingleQuery(keyID='prod_name', queryParam=prod_name, whichTable="Inventory")
-    print(result)
+    result = dynamoDB.singleQuery_returnAllDataForASingleQuery(keyID='prod_ID', queryParam='Space', whichTable="Inventory")
+    # print(result)
 
     return render_template('dispsearchprod.html', user_search=result)
 
