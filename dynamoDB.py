@@ -51,7 +51,11 @@ def InsertNewProducts(prod_id, prod_name, price, desc, quantity, auth, temp_url)
            'auth' : auth,
            'prod_url' : temp_url
        })
-    return response
+    if response['ResponseMetadata']['HTTPStatusCode'] == 200:
+        msg = "Product Successfully Added"
+    else:
+        msg = "Error Adding Product"
+    return msg
 
 def InsertNewUsers(user_id, email, fn, ln, pword, date_joined, addr, city, role):
 
@@ -69,5 +73,9 @@ def InsertNewUsers(user_id, email, fn, ln, pword, date_joined, addr, city, role)
            'city' : city,
            'role' : role
        })
-    return response
+    if response['ResponseMetadata']['HTTPStatusCode'] == 200:
+        msg = "User Successfully Added"
+    else:
+        msg = "Error Adding User"
+    return msg
 
