@@ -138,3 +138,14 @@ def updating_products_db(whichTable, prod_id, prod_name, price, prod_desc, quant
     else:
         msg = "Error Updating Product"
     return msg
+
+
+def delete_user_db(email, whichTable):
+    table = returnCorrectTable(whichTable)
+    response = table.scan(filterExpression=Attr('email').contains(email)
+    )
+    if response['ResponseMetadata']['HTTPStatusCode'] == 200:
+        msg = "Product Successfully Deleted"
+    else:
+        msg = "Error Deleting Product"
+    return msg

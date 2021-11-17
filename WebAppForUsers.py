@@ -459,6 +459,8 @@ def delete_user():
     LOGIN = user.GetLogin()
     email = user.GetEmail()
     if LOGIN and email != "":
+        delete_user_db(email, whichTable="Users")
+
         with sql.connect("UserDatabase.db") as con:
             cur = con.cursor()
             sql_query = """DELETE FROM Users WHERE email=?"""
@@ -516,38 +518,11 @@ def search_product():
 def user_search():
     prod_name = request.form['prod_name']
 
-    # search_prod.SetName(prod_name)
-
-    # with sql.connect("InventoryDatabase.db") as con:
-    #     cur = con.cursor()
-    #     sql_query = """select prod_id from Inventory where prod_name=?"""
-    #     data = [prod_name]
-    #     cur.execute(sql_query, data)
-    #     prod_id = cur.fetchall();
-    #     prod_id = prod_id[0][0]
-    
-    # search_prod.SetID(prod_id)
-
-    # with sql.connect("InventoryDatabase.db") as con:
-    #     con.row_factory = sql.Row
-    #     cur = con.cursor()
-    #     sql_query = """select * from Inventory where prod_name=?"""
-    #     data = [prod_name]
-    #     cur.execute(sql_query, data)
-    #     user_search = cur.fetchall();
-    #     msg = "Product successfully found"
-    #     print(user_search)
-    #     if len(user_search) != 0:
-    #         print(user_search)
-    #         return render_template('dispsearchprod.html', user_search=user_search)
-    #     else:
-    #         msg = "No products found"
-    #         return render_template("new_result.html", msg=msg)
+    search_prod.SetName(prod_name)
 
     inventoryTable = dynamoDB.inventory_returnAllRecordData()
-    print(prod_name)
-    result = dynamoDB.singleQuery_returnAllDataForASingleQuery(keyID='prod_ID', queryParam='Space', whichTable="Inventory")
-    # print(result)
+
+    result = dynamoDB.singleQuery_returnAllDataForASingleQuery(keyID='prod_ID', queryParam=prod_name, whichTable="Inventory")
 
     return render_template('dispsearchprod.html', user_search=result)
 
@@ -567,7 +542,7 @@ def edit_product():
     prod_desc = request.form['desc']
     quantity = request.form['quantity']
     prod_auth = request.form['auth']
-    
+
     msg = updating_products_db(whichTable, prod_id, prod_name, price, prod_desc, quantity, prod_auth)
 
     return render_template("new_result.html", msg=msg)
