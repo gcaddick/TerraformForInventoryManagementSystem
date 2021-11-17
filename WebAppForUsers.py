@@ -632,6 +632,6 @@ if __name__ == '__main__':
 
     search_prod = product_info_obj(prod_id, prod_name)
 
-    app.run(debug=True)  # Starts the app in debug mode
+    app.run(debug=True, host="0.0.0.0")  # Starts the app in debug mode
 
 
