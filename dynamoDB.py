@@ -3,23 +3,19 @@ from boto3.dynamodb.conditions import Key
 
 
 def singleQuery_returnAllDataForASingleQuery(queryParam, whichTable):
-    table = returnCorrectTable(whichTable=whichTable)
-
-    response = table.query(
-        KeyConditionExpression=Key('prod_name'),
-        FilterExpression= 'Space'
-    )
-
-    # response = table.query(KeyConditionExpression= boto3.dynamodb.conditions.Key(queryParam))
+    table = returnCorrectTable(whichTable)
+    response = table.get_item(Key={'user_id': queryParam})
+    response = response['Item']
     return response
 
+    
 def returnCorrectTable(whichTable):
     if whichTable == 'Inventory':
-        dynamodbUSERS = boto3.resource('dynamodb')
+        dynamodbUSERS = boto3.resource('dynamodb', 'eu-west-2')
         table = dynamodbUSERS.Table('Inventory')
         return table
     elif whichTable == 'Users':
-        dynamodbUSERS = boto3.resource('dynamodb')
+        dynamodbUSERS = boto3.resource('dynamodb', 'eu-west-2')
         table = dynamodbUSERS.Table('Users')
         return table
     else:
