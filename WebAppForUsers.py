@@ -70,18 +70,8 @@ def IsUserNew(email):
 # Returns the home.html template which allows the user to use the functions in the website.
 @app.route('/')
 def home():
-    dbConnection = sql.connect("InventoryDatabase.db")
-    dbConnection.row_factory = sql.Row
-
-    cursor = dbConnection.cursor()
-
-    cursor.execute("select * from Inventory")
-
-    rows = cursor.fetchall()
-
-    print("\n -------- Database stuff from home function ----------")
-    print(rows)
-
+    
+    rows = dynamoDB.inventory_returnAllRecordData()
 
     return render_template('futureHomePage.html', rows=rows)
 
@@ -521,34 +511,41 @@ def search_product():
 @app.route('/usersearch', methods=['POST', 'GET'])
 def user_search():
     prod_name = request.form['prod_name']
-    search_prod.SetName(prod_name)
 
-    with sql.connect("InventoryDatabase.db") as con:
-        cur = con.cursor()
-        sql_query = """select prod_id from Inventory where prod_name=?"""
-        data = [prod_name]
-        cur.execute(sql_query, data)
-        prod_id = cur.fetchall();
-        prod_id = prod_id[0][0]
+    # search_prod.SetName(prod_name)
+
+    # with sql.connect("InventoryDatabase.db") as con:
+    #     cur = con.cursor()
+    #     sql_query = """select prod_id from Inventory where prod_name=?"""
+    #     data = [prod_name]
+    #     cur.execute(sql_query, data)
+    #     prod_id = cur.fetchall();
+    #     prod_id = prod_id[0][0]
     
-    search_prod.SetID(prod_id)
+    # search_prod.SetID(prod_id)
 
-    with sql.connect("InventoryDatabase.db") as con:
-        con.row_factory = sql.Row
-        cur = con.cursor()
-        sql_query = """select * from Inventory where prod_name=?"""
-        data = [prod_name]
-        cur.execute(sql_query, data)
-        user_search = cur.fetchall();
-        msg = "Product successfully found"
-        print(user_search)
-        if len(user_search) != 0:
-            print(user_search)
-            return render_template('dispsearchprod.html', user_search=user_search)
-        else:
-            msg = "No products found"
-            return render_template("new_result.html", msg=msg)
+    # with sql.connect("InventoryDatabase.db") as con:
+    #     con.row_factory = sql.Row
+    #     cur = con.cursor()
+    #     sql_query = """select * from Inventory where prod_name=?"""
+    #     data = [prod_name]
+    #     cur.execute(sql_query, data)
+    #     user_search = cur.fetchall();
+    #     msg = "Product successfully found"
+    #     print(user_search)
+    #     if len(user_search) != 0:
+    #         print(user_search)
+    #         return render_template('dispsearchprod.html', user_search=user_search)
+    #     else:
+    #         msg = "No products found"
+    #         return render_template("new_result.html", msg=msg)
 
+    inventoryTable = dynamoDB.inventory_returnAllRecordData()
+
+    result = dynamoDB.singleQuery_returnAllDataForASingleQuery(prod_name, "Inventory")
+    print(result)
+
+    return render_template('dispsearchprod.html', user_search=result)
 
 @app.route('/editprod')
 def dispProdInfo():

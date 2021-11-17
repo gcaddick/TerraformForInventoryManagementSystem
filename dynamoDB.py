@@ -1,14 +1,35 @@
 import boto3
+from boto3.dynamodb.conditions import Key
 
 
+def singleQuery_returnAllDataForASingleQuery(queryParam, whichTable):
+    table = returnCorrectTable(whichTable=whichTable)
 
-def queryADynamoDBTable():
-    return None
+    response = table.query(
+        KeyConditionExpression=Key('prod_name'),
+        FilterExpression= 'Space'
+    )
+
+    # response = table.query(KeyConditionExpression= boto3.dynamodb.conditions.Key(queryParam))
+    return response
+
+def returnCorrectTable(whichTable):
+    if whichTable == 'Inventory':
+        dynamodbUSERS = boto3.resource('dynamodb')
+        table = dynamodbUSERS.Table('Inventory')
+        return table
+    elif whichTable == 'Users':
+        dynamodbUSERS = boto3.resource('dynamodb')
+        table = dynamodbUSERS.Table('Users')
+        return table
+    else:
+        return "This should not execute"
+
 
 def inventory_returnAllRecordData():
 
-    dynamodbUSERS = boto3.resource('dynamodb')
-    table = dynamodbUSERS.Table('Inventory')
+    dynamodbInventory = boto3.resource('dynamodb')
+    table = dynamodbInventory.Table('Inventory')
     allDataFromDynamoDBtable = table.scan(Select='ALL_ATTRIBUTES')
     recordsWithinAllDataFromDynamoDBtable = allDataFromDynamoDBtable['Items']
 
