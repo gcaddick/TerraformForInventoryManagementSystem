@@ -561,6 +561,7 @@ def edit_product():
     # Fetches information from html form
 
     prod_name = search_prod.GetName()
+    prod_id = search_prod.GetID()
     print(prod_name)
     price = request.form['price']
     desc = request.form['desc']
@@ -580,33 +581,28 @@ def edit_product():
 def delete_product():
     prod_name = search_prod.GetName()
     prod_id = search_prod.GetID()
-    with sql.connect("InventoryDatabase.db") as con:
-        cur = con.cursor()
-        sql_query = """DELETE FROM Inventory WHERE prod_name=?"""
-        data = [prod_name]
-        cur.execute(sql_query, data)
-        con.commit()
-        msg = "Product successfully deleted"
+    whichTable = "Inventory"
+    msg = delete_products_db(whichTable, prod_id)
 
-        s3 = boto3.resource('s3')
+    s3 = boto3.resource('s3')
 
-        bucket = bucket_names_object.bucket_names_object()
+    bucket = bucket_names_object.bucket_names_object()
 
-        temp_url = s3_bucket_operations.getUrlForOneProd(prod_id)
-        new_file = temp_url.split('/')
+    temp_url = s3_bucket_operations.getUrlForOneProd(prod_id)
+    new_file = temp_url.split('/')
 
-        length = len(new_file) - 1
-        print(new_file[length])
-        refac_file = new_file[length]
+    length = len(new_file) - 1
+    print(new_file[length])
+    refac_file = new_file[length]
 
-        temp_ext = refac_file.split('.')
-        length = len(temp_ext) - 1
-        ext = temp_ext[length]
+    temp_ext = refac_file.split('.')
+    length = len(temp_ext) - 1
+    ext = temp_ext[length]
 
-        source_file = prod_id + "." + ext
+    source_file = prod_id + "." + ext
 
-        s3.Object(bucket.getSourceBucketName, source_file).delete()
-        s3.Object(bucket.getRefactoredBucketName, refac_file).delete()
+    s3.Object(bucket.getSourceBucketName, source_file).delete()
+    s3.Object(bucket.getRefactoredBucketName, refac_file).delete()
 
 
     return render_template("new_result.html", msg=msg)

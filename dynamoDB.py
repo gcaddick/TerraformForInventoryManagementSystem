@@ -62,7 +62,7 @@ def testForUsersDynamoDB():
     # for record in recordsWithinAllDataFromDynamoDBtable:
     #     print(record['city'])
 
-def InsertNewProducts(prod_id, prod_name, price, desc, quantity, auth, temp_url):
+def InsertNewProducts(prod_id, prod_name, price, prod_desc, quantity, prod_auth, temp_url):
     dynamodbUSERS = boto3.resource('dynamodb', 'eu-west-2')
     table = dynamodbUSERS.Table('Inventory')
     response = table.put_item(
@@ -70,9 +70,9 @@ def InsertNewProducts(prod_id, prod_name, price, desc, quantity, auth, temp_url)
            'prod_ID' : prod_id,
            'prod_name' : prod_name,
            'price' : price,
-           'desc' : desc,
+           'prod_desc' : prod_desc,
            'quantity' : quantity ,
-           'auth' : auth,
+           'prod_auth' : prod_auth,
            'prod_url' : temp_url
        })
     if response['ResponseMetadata']['HTTPStatusCode'] == 200:
@@ -117,4 +117,24 @@ def delete_products_db(whichTable, prod_id):
         msg = "Error Deleting Product"
     return msg
 
-
+def updating_products_db(whichTable, prod_id, prod_name, price, prod_desc, quantity, prod_auth):
+    dynamodbUSERS = boto3.resource('dynamodb', 'eu-west-2')
+    table = dynamodbUSERS.Table('Inventory')
+    response = table.update_item(
+        Key={
+            'prod_ID': prod_id
+        },
+        UpdateExpression="set price=:p, prod_desc=:d, quantity=:q, prod_auth=:a",
+        ExpressionAttributeValues={
+            ':p': price,
+            ':d': prod_desc,
+            ':q': quantity,
+            ':a': prod_auth
+        },
+        ReturnValues="UPDATED_NEW"
+        )
+    if response['ResponseMetadata']['HTTPStatusCode'] == 200:
+        msg = "Product Successfully Updated"
+    else:
+        msg = "Error Updating Product"
+    return msg
