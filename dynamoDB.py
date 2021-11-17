@@ -38,3 +38,18 @@ def testForUsersDynamoDB():
     # for record in recordsWithinAllDataFromDynamoDBtable:
     #     print(record['city'])
 
+def InsertNewProducts(prod_id, prod_name, price, desc, quantity, auth, temp_url):
+    ,,,quantity,auth,prod_url)
+    dynamodbUSERS = boto3.resource('dynamodb')
+    table = dynamodbUSERS.Table('Inventory')
+    response = table.put_item(
+       Item={
+           'prod_ID' : prod_id,
+           'prod_name' : prod_name,
+           'price' : price,
+           'desc' : desc,
+           'quantity' : quantity ,
+           'auth' : auth,
+           'prod_url' : temp_url
+       }
+    return response
