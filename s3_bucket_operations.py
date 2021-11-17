@@ -85,6 +85,8 @@ def getUrlForOneProd(prod_id):
     s3_resource = boto3.resource('s3')
     s3_bucket = s3_resource.Bucket(refactored_bucket)
 
+    # print("***************** Prod name printed below from s3_bucket_operations.py in function getUrlForOneProd ****************")
+    # print(prod_id)
     fileNameSplit = prod_id.split(".") # Splits the filename to get the extension
     filename = fileNameSplit[0]
     filename = filename + "_"
