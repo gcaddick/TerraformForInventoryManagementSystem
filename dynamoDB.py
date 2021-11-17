@@ -50,5 +50,24 @@ def InsertNewProducts(prod_id, prod_name, price, desc, quantity, auth, temp_url)
            'quantity' : quantity ,
            'auth' : auth,
            'prod_url' : temp_url
-       }
+       })
     return response
+
+def InsertNewUsers(user_id, email, fn, ln, pword, date_joined, addr, city, role):
+
+    dynamodbUSERS = boto3.resource('dynamodb')
+    table = dynamodbUSERS.Table('Users')
+    response = table.put_item(
+       Item={
+           'user_id' : user_id,
+           'email' : email,
+           'first_name' : fn,
+           'last_name' : ln,
+           'pword' : pword ,
+           'date_joined' : date_joined,
+           'address' : addr,
+           'city' : city,
+           'role' : role
+       })
+    return response
+

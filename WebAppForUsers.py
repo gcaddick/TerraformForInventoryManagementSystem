@@ -142,13 +142,7 @@ def add_user():
             checkIfUserIsNew = IsUserNew(email)
             date_joined = datetime.now()
             if checkIfUserIsNew:  # If user is new then will add user details to database
-                with sql.connect("UserDatabase.db") as con:
-                    cur = con.cursor()
-                    cur.execute(
-                        "INSERT INTO Users (user_id,email,first_name,last_name,pword,date_joined,address,city,role) VALUES (?,?,?,?,?,?,?,?,?)",
-                        (user_id, email, fn, ln, pword, date_joined, addr, city, role))
-                    con.commit()
-                    msg = "Record successfully added"
+                msg = dynamoDB.InsertNewUsers(user_id, email, fn, ln, pword, date_joined, addr, city, role)
             # This executes if user is not new
             if not checkIfUserIsNew:
                 msg = "This is an exsiting user"
