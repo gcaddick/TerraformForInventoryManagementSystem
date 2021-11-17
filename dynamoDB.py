@@ -2,10 +2,14 @@ import boto3
 from boto3.dynamodb.conditions import Key
 
 
-def singleQuery_returnAllDataForASingleQuery(queryParam, whichTable):
+def singleQuery_returnAllDataForASingleQuery(keyID, whichTable, queryParam=None):
     table = returnCorrectTable(whichTable)
-    response = table.get_item(Key={'user_id': queryParam})
-    response = response['Item']
+    if queryParam == None:
+        response = table.scan(AttributesToGet=[keyID])
+        response = response['Items']
+    else:
+        response = table.get_item(Key={keyID: queryParam})
+        response = response['Item']
     return response
 
 
