@@ -564,17 +564,12 @@ def edit_product():
     prod_id = search_prod.GetID()
     print(prod_name)
     price = request.form['price']
-    desc = request.form['desc']
+    prod_desc = request.form['desc']
     quantity = request.form['quantity']
-    auth = request.form['auth']
+    prod_auth = request.form['auth']
+    
+    msg = updating_products_db(whichTable, prod_id, prod_name, price, prod_desc, quantity, prod_auth)
 
-    with sql.connect("InventoryDatabase.db") as con:
-        cur = con.cursor()
-        sql_query = """Update Inventory set price=?,desc=?,quantity=?,auth=? where prod_name=?"""
-        data = (price,desc,quantity,auth,prod_name)
-        cur.execute(sql_query, data)
-        con.commit()
-        msg = "Record successfully edited"
     return render_template("new_result.html", msg=msg)
 
 @app.route('/deleteprod')
