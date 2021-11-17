@@ -55,14 +55,20 @@ containsAllUrlsForEachS3Bucket = contains_all_urls_for_s3_buckets.contains_all_u
 # Queries the user database by selecting emails where the saved email is the same as the user
 # input email. Returns True is user is new or False if already registered user.
 def IsUserNew(email):
-    con = sql.connect("UserDatabase.db")  # The database to connect to
-    cur = con.cursor()
-    cur.execute("Select email from Users WHERE email=?", (email,))  # Queries database
-    all_emails = cur.fetchall();  # Fetches output from query
-    if len(all_emails) != 0:
-        # Checks if the output of query is not 0. If it's not 0 that means the query has found a match
-        # and therefore the email has been used already, i.e. exisiting user.
+    # con = sql.connect("UserDatabase.db")  # The database to connect to
+    # cur = con.cursor()
+    # cur.execute("Select email from Users WHERE email=?", (email,))  # Queries database
+    # all_emails = cur.fetchall();  # Fetches output from query
+    # if len(all_emails) != 0:
+    #     # Checks if the output of query is not 0. If it's not 0 that means the query has found a match
+    #     # and therefore the email has been used already, i.e. exisiting user.
+    #     return False
+
+    resultOfQuery = dynamoDB.singleQuery_returnAllDataForASingleQuery(keyID='email', whichTable='Users', queryParam=email)
+
+    if resultOfQuery == {}:
         return False
+
     return True
 
 
@@ -74,22 +80,6 @@ def home():
     rows = dynamoDB.inventory_returnAllRecordData()
 
     return render_template('futureHomePage.html', rows=rows)
-
-
-@app.route('/oldhome')
-def oldHome():
-    # print(user_role)
-    # print(LOGIN)
-    LOGIN = user.GetLogin()
-    user_role = user.GetRole()
-    if (LOGIN) and (user_role == "Warehouse" or user_role =="Authenticator"):
-        return render_template('home.html')
-    elif not LOGIN:
-        msg = "Please login first"
-        return render_template("new_result.html", msg=msg)
-    else:
-        msg = "Not authorised"
-        return render_template("new_result.html", msg=msg)
 
 
 # Called when the user wants to add a new user
@@ -148,20 +138,6 @@ def add_user():
             con.close()
 
 
-# Lists the users in the database
-# For debugging, will not be in the final website
-@app.route('/list')
-def list_users():
-    con = sql.connect("UserDatabase.db")
-    con.row_factory = sql.Row
-
-    cur = con.cursor()
-    cur.execute("select * from Users")
-
-    rows = cur.fetchall();
-    return render_template("list.html", rows=rows)
-
-
 # USer login page, calls the check_user_login function
 @app.route('/UserLogin')
 def user_login():
@@ -184,41 +160,70 @@ def check_user_login():
     login_email = user.GetEmail()
 
     if request.method == "POST":
-        try:
+        # try:
             # Gets the information from the user
-            email = request.form['email']
-            pword = request.form['pword']
-            with sql.connect("UserDatabase.db") as con:
-                cur = con.cursor()
-                # Selects the user where email and password match
-                cur.execute("Select * from Users WHERE email=? AND pword=?", (email, pword,))
-                user_info = cur.fetchall();
-                # If len(user_info) = 1, this means the query has found a user and therefore the user is logged in
-                if len(user_info) == 1:
-                    # User is told they are logged in
-                    msg = "Successful Login"
-                    # login_email = email
-                    user.SetEmail(email)
-                    # Sets the global variable, therefore allowing this to be seen later on
-                    LOGIN = True
-                    user.SetLogin(LOGIN)
-                    cur.execute("Select role from Users WHERE email=? AND pword=?", (email, pword,))
-                    user_role = cur.fetchall();
-                    user_role = ''.join(user_role[0])
-                    user.SetRole(user_role)
-                    msg = "Successful Login and role is: " + user_role
-                else:
-                    # If anything else is found then the login is unsucessful and so the user is told
-                    msg = "Unsuccessful Login"
-                    LOGIN = False
-                    user.SetLogin(LOGIN)
-        except:
-            con.rollback()
-            msg = "Error in insert operation"
+        email = request.form['email']
+        pword = request.form['pword']
 
-        finally:
-            return render_template("new_result.html", msg=msg)
-            con.close()
+        print(email)
+        print(pword)
+
+        getUserRecord = dynamoDB.singleQuery_returnAllDataForASingleQuery(keyID='user_id', queryParam=email, whichTable='Users')
+
+        print(getUserRecord)
+
+        if getUserRecord != []: # i.e. This user does exist
+            # User is told they are logged in
+            msg = "Successful Login"
+            user.SetEmail(email)
+            # Sets the global variable, therefore allowing this to be seen later on
+            LOGIN = True
+            user.SetLogin(LOGIN)
+            user_role = getUserRecord['role']
+            user.SetRole(user_role)
+            msg = "Successful Login and role is: " + user_role
+        else:
+            # If anything else is found then the login is unsucessful and so the user is told
+            msg = "Unsuccessful Login"
+            LOGIN = False
+            user.SetLogin(LOGIN)
+            
+        # except:
+            
+        #     msg = "Error in insert operation"
+
+        #     with sql.connect("UserDatabase.db") as con:
+        #         cur = con.cursor()
+        #         # Selects the user where email and password match
+        #         cur.execute("Select * from Users WHERE email=? AND pword=?", (email, pword,))
+        #         user_info = cur.fetchall();
+        #         # If len(user_info) = 1, this means the query has found a user and therefore the user is logged in
+        #         if len(user_info) == 1:
+        #             # User is told they are logged in
+        #             msg = "Successful Login"
+        #             # login_email = email
+        #             user.SetEmail(email)
+        #             # Sets the global variable, therefore allowing this to be seen later on
+        #             LOGIN = True
+        #             user.SetLogin(LOGIN)
+        #             cur.execute("Select role from Users WHERE email=? AND pword=?", (email, pword,))
+        #             user_role = cur.fetchall();
+        #             user_role = ''.join(user_role[0])
+        #             user.SetRole(user_role)
+        #             msg = "Successful Login and role is: " + user_role
+        #         else:
+        #             # If anything else is found then the login is unsucessful and so the user is told
+        #             msg = "Unsuccessful Login"
+        #             LOGIN = False
+        #             user.SetLogin(LOGIN)
+        # except:
+        #     con.rollback()
+        #     msg = "Error in insert operation"
+
+        return render_template("new_result.html", msg=msg)
+        # finally:
+        #     return render_template("new_result.html", msg=msg)
+        #     con.close()
 
 # For adding new products to inventory
 @app.route('/newproduct')
@@ -388,23 +393,6 @@ def check_user_info():
     login_email = user.GetEmail()
     print(login_email)
     if LOGIN:
-        # with sql.connect("UserDatabase.db") as con:
-        #     cur = con.cursor()
-        #     # Selects the user where email and password match
-        #     cur.execute("Select * from Users WHERE email=?", (login_email,))
-        #     user_info = cur.fetchall();
-        #     print(user_info)
-
-        # tup=user_info[0]
-
-        # email = tup[1]
-        # fn = tup[2]
-        # ln = tup[3]
-        # pword = tup[4]
-        # date_joined = tup[5]
-        # addr = tup[6]
-        # city = tup[7]
-        # role = tup[8]
 
         allItems = dynamoDB.users_returnAllRecordData()
 
@@ -546,7 +534,7 @@ def user_search():
 
     inventoryTable = dynamoDB.inventory_returnAllRecordData()
     print(prod_name)
-    result = dynamoDB.singleQuery_returnAllDataForASingleQuery(keyID='prod_ID', queryParam='Space', whichTable="Inventory")
+    result = dynamoDB.singleQuery_returnAllDataForASingleQuery(keyID='prod_ID', queryParam=prod_name, whichTable="Inventory")
     # print(result)
 
     return render_template('dispsearchprod.html', user_search=result)

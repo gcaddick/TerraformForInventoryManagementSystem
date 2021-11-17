@@ -10,7 +10,9 @@ def singleQuery_returnAllDataForASingleQuery(keyID, whichTable, queryParam=None)
         response = response['Items']
     
     else:
-        response = table.scan(FilterExpression=Attr('prod_name').contains(queryParam))
+        print(table)
+        response = table.scan(FilterExpression=Attr(keyID).contains(queryParam))
+        print(response)
         response = response['Items']
 
     return response
