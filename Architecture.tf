@@ -158,18 +158,6 @@ resource "aws_route_table_association" "subnet-association" {
 }
 
 
-/*--------------------------------------------------------------------------
-                         Defines ALB 
---------------------------------------------------------------------------*/
-resource "aws_lb" "AppALBtoEC2" {
-    name               = "ALBtoEC2"
-    internal           = false
-    load_balancer_type = "application"
-    subnets            = [aws_subnet.PublicSubnet.id]
-    security_groups    = [aws_security_group.sg_ALB.id]
-
-}
-
 
 /*--------------------------------------------------------------------------
               Creates the bucket for Wesite code and templates 
@@ -183,37 +171,6 @@ resource "aws_s3_bucket" "template-bucket" {
  versioning {
     enabled = true
  }
-}
-*/
-
-/*
-/*--------------------------------------------------------------------------
-  Defines DynamoDB tables for user information and inventory information 
---------------------------------------------------------------------------*/
-resource "aws_dynamodb_table" "UserDatabaseDynamoDB" {
-  name           = "UserDatabase"
-  billing_mode   = "PROVISIONED"
-  read_capacity  = 20
-  write_capacity = 20
-  hash_key       = "user_id"
-
-  attribute {
-    name = "user_id"
-    type = "S"
-  }
-}
-
-resource "aws_dynamodb_table" "InventoryDatabaseDynamoDB" {
-  name           = "InventoryDatabase"
-  billing_mode   = "PROVISIONED"
-  read_capacity  = 20
-  write_capacity = 20
-  hash_key       = "prod_ID"
-
-  attribute {
-    name = "prod_ID"
-    type = "S"
-  }
 }
 */
 
@@ -292,7 +249,11 @@ resource "aws_instance" "WebsiteEC2" {
   security_groups = ["${aws_security_group.sg_ec2.id}"]
 }
 
-// Defines secret manager
+
+/*--------------------------------------------------------------------------
+          Defines secret manager
+--------------------------------------------------------------------------*/
+/*
 resource "aws_secretsmanager_secret" "Secrets" {
   name = "SuperSecret"
 }
@@ -301,83 +262,5 @@ resource "aws_secretsmanager_secret_version" "DynamoDBSecrets" {
   secret_id     = aws_secretsmanager_secret.Secrets.id
   secret_string = "example-string-to-protect"
 }
-
-
-/*--------------------------------------------------------------------------
-             Resize Image Terraform code
---------------------------------------------------------------------------*/
-/*
-
-/*--------------------------------------------------------------------------
-             Creates the source image bucket
---------------------------------------------------------------------------*/
-resource "aws_s3_bucket" "source-image-bucket" {
-    bucket = "test-source-image-bucket-5623"
-    acl = "public-read-write"
-    force_destroy = true
-
- versioning {
-    enabled = true
- }
-}
-
-/*--------------------------------------------------------------------------
-             Creates the refactored image bucket
---------------------------------------------------------------------------*/
-resource "aws_s3_bucket" "refactored-image-bucket" {
-    bucket = "test-refactored-image-bucket-5623"
-    acl = "public-read-write"
-    force_destroy = true
-    
- versioning {
-    enabled = true
- }
-}
-
-/*--------------------------------------------------------------------------
-          Allows Lambda function to be invoked from S3 bucket
---------------------------------------------------------------------------*/
-resource "aws_lambda_permission" "allow_source_bucket" {
-  statement_id  = "AllowExecutionFromS3Bucket"
-  action        = "lambda:InvokeFunction"
-  function_name = "lambda_function"
-  principal     = "s3.amazonaws.com"
-  source_arn    = aws_s3_bucket.source-image-bucket.arn
-}
-
-/*--------------------------------------------------------------------------
-              Creates function from zip file
---------------------------------------------------------------------------*/
-resource "aws_lambda_function" "func" {
-  filename      = "lambda_function.zip"
-  function_name = "lambda_function"
-  role          = "arn:aws:iam::257173663825:role/lambda_stuffs"
-  handler       = "lambda_function.lambda_handler"
-  runtime       = "python3.8"
-  layers        = ["arn:aws:lambda:eu-west-2:770693421928:layer:Klayers-python38-Pillow:14"]
-  
-  timeout = 15
-  
-  environment {
-       variables = {
-           DST_BUCKET = "refactored-image-bucket-5623"
-           REGION = "eu-west-2"
-        }
-  }
-}
-
-/*--------------------------------------------------------------------------
-      Sets S3 notification when object is created in source bucket
-      triggers lambda function
---------------------------------------------------------------------------*/
-resource "aws_s3_bucket_notification" "bucket_notification" {
-  bucket = aws_s3_bucket.source-image-bucket.id
-
-  lambda_function {
-    lambda_function_arn = aws_lambda_function.func.arn
-    events              = ["s3:ObjectCreated:*"]
-  }
-
-  depends_on = [aws_lambda_permission.allow_source_bucket]
-}
 */
+
