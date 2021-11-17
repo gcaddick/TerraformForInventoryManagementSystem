@@ -388,23 +388,40 @@ def check_user_info():
     login_email = user.GetEmail()
     print(login_email)
     if LOGIN:
-        with sql.connect("UserDatabase.db") as con:
-            cur = con.cursor()
-            # Selects the user where email and password match
-            cur.execute("Select * from Users WHERE email=?", (login_email,))
-            user_info = cur.fetchall();
-            print(user_info)
+        # with sql.connect("UserDatabase.db") as con:
+        #     cur = con.cursor()
+        #     # Selects the user where email and password match
+        #     cur.execute("Select * from Users WHERE email=?", (login_email,))
+        #     user_info = cur.fetchall();
+        #     print(user_info)
 
-        tup=user_info[0]
+        # tup=user_info[0]
 
-        email = tup[1]
-        fn = tup[2]
-        ln = tup[3]
-        pword = tup[4]
-        date_joined = tup[5]
-        addr = tup[6]
-        city = tup[7]
-        role = tup[8]
+        # email = tup[1]
+        # fn = tup[2]
+        # ln = tup[3]
+        # pword = tup[4]
+        # date_joined = tup[5]
+        # addr = tup[6]
+        # city = tup[7]
+        # role = tup[8]
+
+        allItems = dynamoDB.users_returnAllRecordData()
+
+        print(allItems)
+
+        for record in allItems:
+            # print(record['email'])
+            if record['email'] == login_email:
+                email = record['email']
+                fn = record['first_name']
+                ln = record['last_name']
+                pword = record['pword']
+                date_joined = record['date_joined']
+                addr = record['address']
+                city = record['city']
+                role = record['role']
+                break
 
         return render_template("UserInfo.html", email=email,fn=fn,ln=ln,pword=pword,date_joined=date_joined,addr=addr,city=city,role=role)
     else:
@@ -528,8 +545,8 @@ def user_search():
     #         return render_template("new_result.html", msg=msg)
 
     inventoryTable = dynamoDB.inventory_returnAllRecordData()
-
-    result = dynamoDB.singleQuery_returnAllDataForASingleQuery(prod_name, "Inventory")
+    print(prod_name)
+    result = dynamoDB.singleQuery_returnAllDataForASingleQuery(keyID='prod_name', queryParam=prod_name, whichTable="Inventory")
     print(result)
 
     return render_template('dispsearchprod.html', user_search=result)
