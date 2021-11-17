@@ -222,11 +222,25 @@ resource "aws_iam_role_policy" "web_iam_role_policy" {
         "s3:DeleteObject"
       ],
       "Resource": ["arn:aws:s3:::template-bucket-5623/*"]
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["dynamodb:*"],
+      "Resource": ["arn:aws:dynamodb:eu-west-2:257173663825:table/Inventory"]
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["dynamodb:*"],
+      "Resource": ["arn:aws:dynamodb:eu-west-2:257173663825:table/Users"]
     }
   ]
 }
 EOF
 }
+
+
+
+
 
 /*--------------------------------------------------------------------------
           Creates elastic IP for EC2
