@@ -130,15 +130,9 @@ def add_user():
 
             # Checks if the user is new
             checkIfUserIsNew = IsUserNew(email)
-            date_joined = datetime.now()
+            date_joined = str(datetime.now())
             if checkIfUserIsNew:  # If user is new then will add user details to database
-                with sql.connect("UserDatabase.db") as con:
-                    cur = con.cursor()
-                    cur.execute(
-                        "INSERT INTO Users (user_id,email,first_name,last_name,pword,date_joined,address,city,role) VALUES (?,?,?,?,?,?,?,?,?)",
-                        (user_id, email, fn, ln, pword, date_joined, addr, city, role))
-                    con.commit()
-                    msg = "Record successfully added"
+                msg = dynamoDB.InsertNewUsers(user_id, email, fn, ln, pword, date_joined, addr, city, role)
             # This executes if user is not new
             if not checkIfUserIsNew:
                 msg = "This is an exsiting user"
@@ -314,16 +308,9 @@ def add_product():
                 print("-----yoyoyooy------")
                 print(filename)
                 temp_url = s3_bucket_operations.getUrlForOneProd(filename)
-
-                with sql.connect("InventoryDatabase.db") as con:
-                    cur = con.cursor()
-                    # Inserts the new product into the database
-                    cur.execute(
-                        "INSERT INTO Inventory (prod_ID,prod_name,price,desc,quantity,auth,prod_url) VALUES (?,?,?,?,?,?,?)",
-                        (prod_id, prod_name, price, desc, quantity, auth, temp_url))
-                    con.commit()
-                    msg = "Product successfully added"  # Tells the user the outcome
-                    msg = msg + " and " + msgFromS3Upload
+                msg = dynamoDB.InsertNewProducts(prod_id, prod_name, price, desc, quantity, auth, temp_url)
+                msg = "Product successfully added"  # Tells the user the outcome
+                msg = msg + " and " + msgFromS3Upload
             if not checkIfProdIsNew:  # If the product id is already there, the user will be told and the product is not added
                 msg = "This is an exsiting product"
         except:
@@ -631,7 +618,7 @@ if __name__ == '__main__':
 
     search_prod = product_info_obj(prod_id, prod_name)
 
-    dynamoDB.testForUsersDynamoDB()
+    #dynamoDB.testForUsersDynamoDB()
 
     app.run(debug=True)  # Starts the app in debug mode
 
