@@ -10,6 +10,8 @@ import bucket_names_object
 import contains_all_urls_for_s3_buckets
 from user_login_obj import user_login_obj
 from product_info_obj import product_info_obj
+import dynamoDB
+
 
 """
 Importing serveral packages
@@ -77,8 +79,8 @@ def home():
 
     rows = cursor.fetchall()
 
-    # print("\n -------- Database stuff from home function ----------")
-    # print(rows)
+    print("\n -------- Database stuff from home function ----------")
+    print(rows)
 
 
     return render_template('futureHomePage.html', rows=rows)
@@ -631,6 +633,8 @@ if __name__ == '__main__':
     prod_name = ""
 
     search_prod = product_info_obj(prod_id, prod_name)
+
+    dynamoDB.testForUsersDynamoDB()
 
     app.run(debug=True)  # Starts the app in debug mode
 
