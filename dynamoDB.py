@@ -39,7 +39,7 @@ def testForUsersDynamoDB():
     #     print(record['city'])
 
 def InsertNewProducts(prod_id, prod_name, price, desc, quantity, auth, temp_url):
-    dynamodbUSERS = boto3.resource('dynamodb')
+    dynamodbUSERS = boto3.resource('dynamodb', 'eu-west-2')
     table = dynamodbUSERS.Table('Inventory')
     response = table.put_item(
        Item={
@@ -55,7 +55,7 @@ def InsertNewProducts(prod_id, prod_name, price, desc, quantity, auth, temp_url)
 
 def InsertNewUsers(user_id, email, fn, ln, pword, date_joined, addr, city, role):
 
-    dynamodbUSERS = boto3.resource('dynamodb')
+    dynamodbUSERS = boto3.resource('dynamodb', 'eu-west-2')
     table = dynamodbUSERS.Table('Users')
     response = table.put_item(
        Item={

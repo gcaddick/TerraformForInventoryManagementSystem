@@ -140,7 +140,7 @@ def add_user():
 
             # Checks if the user is new
             checkIfUserIsNew = IsUserNew(email)
-            date_joined = datetime.now()
+            date_joined = str(datetime.now())
             if checkIfUserIsNew:  # If user is new then will add user details to database
                 msg = dynamoDB.InsertNewUsers(user_id, email, fn, ln, pword, date_joined, addr, city, role)
             # This executes if user is not new
@@ -621,7 +621,7 @@ if __name__ == '__main__':
 
     search_prod = product_info_obj(prod_id, prod_name)
 
-    dynamoDB.testForUsersDynamoDB()
+    #dynamoDB.testForUsersDynamoDB()
 
     app.run(debug=True)  # Starts the app in debug mode
 
