@@ -117,7 +117,6 @@ def add_user():
             if not checkIfUserIsNew:
                 msg = "This is an exsiting user"
         except:
-            con.rollback()
             msg = "Error in insert operation"
 
         finally:
@@ -125,7 +124,6 @@ def add_user():
             # 1 of 3 options: Successfully add, not added due to existing user or error
             # Correct message will display depending on which of the 3 options happens
             return render_template("new_result.html", msg=msg)
-            con.close()
 
 
 # USer login page, calls the check_user_login function
@@ -205,6 +203,7 @@ def new_product():
 
 # Using the product id, the product is checked to see if it already exists
 def IsProdNew(prod_id):
+    whichTable = "Inventory"
     all_prod_id = dynamoDB.singleQuery_returnAllDataForASingleQuery(keyID='prod_ID', whichTable=whichTable, queryParam=prod_id)
   # Selects the products that have the same ID as the one given
     if len(all_prod_id) != 0:  # If there are some clashes the new product is not added
@@ -257,18 +256,16 @@ def add_product():
 
                 temp_url = s3_bucket_operations.getUrlForOneProd(filename)
                 msg = dynamoDB.InsertNewProducts(prod_id, prod_name, price, desc, quantity, auth, temp_url)
-                msg = "Product successfully added"  # Tells the user the outcome
+                # msg = "Product successfully added"  # Tells the user the outcome
                 msg = msg + " and " + msgFromS3Upload
             if not checkIfProdIsNew:  # If the product id is already there, the user will be told and the product is not added
                 msg = "This is an exsiting product"
         except:
-            con.rollback()
             msg = "Error in insert operation"
 
         finally:
 
             return render_template("new_result.html", msg=msg)
-            con.close()
 
 @app.route('/dispImage')
 def disp_image():
