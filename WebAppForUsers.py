@@ -388,24 +388,6 @@ def check_user_info():
     login_email = user.GetEmail()
     print(login_email)
     if LOGIN:
-        # with sql.connect("UserDatabase.db") as con:
-        #     cur = con.cursor()
-        #     # Selects the user where email and password match
-        #     cur.execute("Select * from Users WHERE email=?", (login_email,))
-        #     user_info = cur.fetchall();
-        #     print(user_info)
-
-        # tup=user_info[0]
-
-        # email = tup[1]
-        # fn = tup[2]
-        # ln = tup[3]
-        # pword = tup[4]
-        # date_joined = tup[5]
-        # addr = tup[6]
-        # city = tup[7]
-        # role = tup[8]
-
         allItems = dynamoDB.users_returnAllRecordData()
 
         print(allItems)
@@ -431,18 +413,18 @@ def check_user_info():
 @app.route('/edituserinfo', methods=['POST', 'GET'])
 def edit_user():
     # Fetches information from html form
+
+    LOGIN = user.GetLogin()
+    email = user.GetEmail()
+
     fn = request.form['fn']
     ln = request.form['ln']
     pword = request.form['pword']
     addr = request.form['addr']
     city = request.form['city']
-    with sql.connect("UserDatabase.db") as con:
-        cur = con.cursor()
-        sql_query = """Update Users set first_name=?,last_name=?,pword=?,address=?,city=? where email=?"""
-        data = (fn,ln,pword,addr,city,login_email)
-        cur.execute(sql_query, data)
-        con.commit()
-        msg = "Record successfully edited"
+
+    msg = updating_user_info(whichTable, email, fn, ln, pword, addr, city)
+
     return render_template("new_result.html", msg=msg)
 
 @app.route('/edituser')
@@ -459,15 +441,7 @@ def delete_user():
     LOGIN = user.GetLogin()
     email = user.GetEmail()
     if LOGIN and email != "":
-        delete_user_db(email, whichTable="Users")
-
-        with sql.connect("UserDatabase.db") as con:
-            cur = con.cursor()
-            sql_query = """DELETE FROM Users WHERE email=?"""
-            data = [email]
-            cur.execute(sql_query, data)
-            con.commit()
-            msg = "User successfully deleted"
+        msg = delete_user_db(email, whichTable="Users")
     else:
         msg = "User not deleted"
     return render_template("new_result.html", msg=msg)
@@ -543,6 +517,7 @@ def edit_product():
     quantity = request.form['quantity']
     prod_auth = request.form['auth']
 
+    whichTable = "Inventory"
     msg = updating_products_db(whichTable, prod_id, prod_name, price, prod_desc, quantity, prod_auth)
 
     return render_template("new_result.html", msg=msg)

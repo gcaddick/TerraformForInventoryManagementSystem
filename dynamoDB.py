@@ -118,8 +118,7 @@ def delete_products_db(whichTable, prod_id):
     return msg
 
 def updating_products_db(whichTable, prod_id, prod_name, price, prod_desc, quantity, prod_auth):
-    dynamodbUSERS = boto3.resource('dynamodb', 'eu-west-2')
-    table = dynamodbUSERS.Table('Inventory')
+    table = returnCorrectTable(whichTable)
     response = table.update_item(
         Key={
             'prod_ID': prod_id
@@ -149,4 +148,29 @@ def delete_user_db(email, whichTable):
         msg = "User Successfully Deleted"
     else:
         msg = "Error Deleting Product"
+    return msg
+
+def updating_user_info(whichTable, email, fn, ln, pword, addr, city):
+
+    response = singleQuery_returnAllDataForASingleQuery(keyID='email', whichTable=whichTable, queryParam=email)
+    resp = response[0]['user_id']
+    table = returnCorrectTable(whichTable)
+    response = table.update_item(
+        Key={
+            'user_id': resp
+        },
+        UpdateExpression="set first_name=:f, last_name=:l, pword=:p, address=:a, city=:c",
+        ExpressionAttributeValues={
+            ':f': fn,
+            ':l': ln,
+            ':p': pword,
+            ':a': addr,
+            ':c': city
+        },
+        ReturnValues="UPDATED_NEW"
+        )
+    if response['ResponseMetadata']['HTTPStatusCode'] == 200:
+        msg = "Product Successfully Updated"
+    else:
+        msg = "Error Updating Product"
     return msg
