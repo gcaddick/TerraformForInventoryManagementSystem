@@ -247,11 +247,8 @@ def new_product():
 
 # Using the product id, the product is checked to see if it already exists
 def IsProdNew(prod_id):
-    con = sql.connect("InventoryDatabase.db")  # Connects to the inventory Database
-    cur = con.cursor()
-    cur.execute("Select prod_id from Inventory WHERE prod_id=?",
-                (prod_id,))  # Selects the products that have the same ID as the one given
-    all_prod_id = cur.fetchall();
+   all_prod_id = dynamoDB.singleQuery_returnAllDataForASingleQuery(keyID='prod_ID', whichTable=whichTable, queryParam=prod_id)
+  # Selects the products that have the same ID as the one given
     if len(all_prod_id) != 0:  # If there are some clashes the new product is not added
         return False
     return True
@@ -284,11 +281,8 @@ def upload(prod_id, img):  # Uses the prod_id to name the picture uploaded to so
 # Gets the information for the new product from the user via form
 @app.route('/addproduct', methods=['POST', 'GET'])
 def add_product():
-    # global prod_id
-
     if request.method == "POST":
         try:
-
             prod_id = request.form['prod_ID']
             prod_name = request.form['prod_name']
             price = request.form['price']
@@ -299,14 +293,10 @@ def add_product():
 
             checkIfProdIsNew = IsProdNew(prod_id)  # Checks if the product is new or exisiting
 
-            print("-------------> ") #Debug
-            print(checkIfProdIsNew)
-
             if checkIfProdIsNew:
-                print("In first If ")
+
                 msgFromS3Upload, filename = upload(prod_id, img)
-                print("-----yoyoyooy------")
-                print(filename)
+
                 temp_url = s3_bucket_operations.getUrlForOneProd(filename)
                 msg = dynamoDB.InsertNewProducts(prod_id, prod_name, price, desc, quantity, auth, temp_url)
                 msg = "Product successfully added"  # Tells the user the outcome
@@ -321,50 +311,6 @@ def add_product():
 
             return render_template("new_result.html", msg=msg)
             con.close()
-
-
-# List the products from the database for the users to see
-@app.route('/listprods')
-def list_prods():
-    con = sql.connect("InventoryDatabase.db")
-    con.row_factory = sql.Row
-
-    cur = con.cursor()
-    cur.execute("select * from Inventory")
-
-    rows = cur.fetchall();
-    print(rows)
-    return render_template("listprods.html", rows=rows)
-
-
-@app.route('/devTest')
-# Show future version of what our home page will be
-def devTest():
-    # START - Dev test stuff
-    # s3_bucket_operations.getFileNamesOfObjectsWithinAnS3Bucket(nameOfS3BucketToBeCalled = "refactored-image-bucket-5623")
-
-    # s3_bucket_operations.getURLsOfAnObjectWithinAnS3Bucket(nameOfS3BucketToBeCalled="source-image-bucket-5623",
-    #                                                        nameOfObjectFile="beach.jpg")
-
-    print(s3_bucket_operations.getAllObjectsURLsFromS3AsList(nameOfS3BucketToBeCalled="refactored-image-bucket-5623"))
-
-    # DATABASE STUFFS
-    dbConnection = sql.connect("InventoryDatabase.db")
-    dbConnection.row_factory = sql.Row
-
-    cursor = dbConnection.cursor()
-    # cursor.execute("select prod_url from Inventory")
-    cursor.execute("select * from Inventory")
-
-    rows = cursor.fetchall()
-
-    print("\n -------- Database stuff from DEVTEST function ----------")
-    print(rows)
-
-    # END - Dev test stuff
-
-    return render_template('futureHomePage.html', rows=rows)  # todo keep this here
-
 
 @app.route('/dispImage')
 def disp_image():
@@ -423,7 +369,7 @@ def edit_user():
     addr = request.form['addr']
     city = request.form['city']
 
-    msg = updating_user_info(whichTable, email, fn, ln, pword, addr, city)
+    msg = dynamoDB.updating_user_info(whichTable, email, fn, ln, pword, addr, city)
 
     return render_template("new_result.html", msg=msg)
 
@@ -441,7 +387,7 @@ def delete_user():
     LOGIN = user.GetLogin()
     email = user.GetEmail()
     if LOGIN and email != "":
-        msg = delete_user_db(email, whichTable="Users")
+        msg = dynamoDB.delete_user_db(email, whichTable="Users")
     else:
         msg = "User not deleted"
     return render_template("new_result.html", msg=msg)
@@ -518,7 +464,7 @@ def edit_product():
     prod_auth = request.form['auth']
 
     whichTable = "Inventory"
-    msg = updating_products_db(whichTable, prod_id, prod_name, price, prod_desc, quantity, prod_auth)
+    msg = dynamoDB.updating_products_db(whichTable, prod_id, prod_name, price, prod_desc, quantity, prod_auth)
 
     return render_template("new_result.html", msg=msg)
 
