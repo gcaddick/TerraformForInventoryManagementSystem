@@ -10,7 +10,7 @@ def singleQuery_returnAllDataForASingleQuery(keyID, whichTable, queryParam=None)
         response = response['Items']
     
     else:
-        response = table.scan(FilterExpression=Attr('prod_name').contains(queryParam))
+        response = table.scan(FilterExpression=Attr(keyID).contains(queryParam))
         response = response['Items']
 
     return response
@@ -141,11 +141,12 @@ def updating_products_db(whichTable, prod_id, prod_name, price, prod_desc, quant
 
 
 def delete_user_db(email, whichTable):
+    response = singleQuery_returnAllDataForASingleQuery(keyID='email', whichTable=whichTable, queryParam=email)
+    resp = response[0]['user_id']
     table = returnCorrectTable(whichTable)
-    response = table.scan(filterExpression=Attr('email').contains(email)
-    )
+    response = table.delete_item(Key={'user_id':resp})
     if response['ResponseMetadata']['HTTPStatusCode'] == 200:
-        msg = "Product Successfully Deleted"
+        msg = "User Successfully Deleted"
     else:
         msg = "Error Deleting Product"
     return msg
