@@ -148,15 +148,17 @@ def check_user_login():
     LOGIN = user.GetLogin()
     user_role = user.GetRole()
     login_email = user.GetEmail()
-
+    print("im here")
     if request.method == "POST":
+        print("im now here")
         try:
             # Gets the information from the user
             email = request.form['email']
             pword = request.form['pword']
-            
-            resultOfQuery = singleQuery_returnAllDataForASingleQuery(keyID='email', whichTable='Users', queryParam=email)
+            print("im now there")
+            resultOfQuery = dynamoDB.singleQuery_returnAllDataForASingleQuery(keyID='email', whichTable='Users', queryParam=email)
             print(resultOfQuery)
+            print("im there")
             if resultOfQuery[0]['pword'] == pword:
                 LOGIN = True
                 user.SetLogin(LOGIN)
@@ -165,18 +167,16 @@ def check_user_login():
                 msg = "Successful Login and role is: " + user_role
 
             else:
-
                 # If anything else is found then the login is unsucessful and so the user is told
                 msg = "Unsuccessful Login"
                 LOGIN = False
                 user.SetLogin(LOGIN)
         except:
-            con.rollback()
             msg = "Error in insert operation"
 
         finally:
             return render_template("new_result.html", msg=msg)
-            con.close()
+
 
 # For adding new products to inventory
 @app.route('/newproduct')
@@ -205,7 +205,7 @@ def new_product():
 
 # Using the product id, the product is checked to see if it already exists
 def IsProdNew(prod_id):
-   all_prod_id = dynamoDB.singleQuery_returnAllDataForASingleQuery(keyID='prod_ID', whichTable=whichTable, queryParam=prod_id)
+    all_prod_id = dynamoDB.singleQuery_returnAllDataForASingleQuery(keyID='prod_ID', whichTable=whichTable, queryParam=prod_id)
   # Selects the products that have the same ID as the one given
     if len(all_prod_id) != 0:  # If there are some clashes the new product is not added
         return False
@@ -482,6 +482,6 @@ if __name__ == '__main__':
 
     #dynamoDB.testForUsersDynamoDB()
 
-    app.run(debug=True)  # Starts the app in debug mode
+    app.run(debug=True, host="0.0.0.0")  # Starts the app in debug mode
 
 
