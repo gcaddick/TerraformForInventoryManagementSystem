@@ -258,7 +258,7 @@ resource "aws_instance" "WebsiteEC2" {
   instance_type = "t2.micro"
   subnet_id = aws_subnet.PrivateSubnet.id
   user_data = "${file("user-data-website.sh")}"
-  key_name = "testKeyPair"
+  key_name = "testKeyPair2"
   iam_instance_profile = "${aws_iam_instance_profile.web_instance_profile.id}"
   security_groups = ["${aws_security_group.sg_ec2.id}"]
 }
