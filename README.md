@@ -7,12 +7,12 @@ To make an inventory management system using AWS services
 This application allows you to:
 
 Add new products
--Search Products
--User Info
--Edit Account
--Register
--Login
--Logout
+- Search Products
+- User Info
+- Edit Account
+- Register
+- Login
+- Logout
 
 Registering a user as a “Warehouse” account will allow you to have administrative privileges when using the application. You have an option to select the type of account, via a drop down menu, when on the account registration page. Alternatively, you can select the option to register as a “Customer”, which will then limit your privileges. 
 
